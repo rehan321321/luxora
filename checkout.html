@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LUXORA | Checkout</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root{
+      --bg:#080808;
+      --bg-soft:rgba(255,255,255,0.06);
+      --card:rgba(255,255,255,0.08);
+      --text:#f5f5f7;
+      --muted:#b8b8c2;
+      --line:rgba(255,255,255,0.1);
+      --accent:#2997ff;
+      --accent-2:#7c3aed;
+      --success:#1fd17d;
+      --danger:#ef4444;
+      --shadow:0 20px 60px rgba(0,0,0,0.4);
+      --grad:linear-gradient(135deg,#0ea5e9,#7c3aed,#f43f5e);
+    }
+    body.light{
+      --bg:#f5f7fb;
+      --bg-soft:rgba(255,255,255,0.7);
+      --card:rgba(255,255,255,0.78);
+      --text:#101114;
+      --muted:#5f6470;
+      --line:rgba(0,0,0,0.08);
+      --accent:#0071e3;
+      --accent-2:#6d28d9;
+      --shadow:0 20px 50px rgba(0,0,0,0.08);
+      --grad:linear-gradient(135deg,#0ea5e9,#2563eb,#7c3aed);
+    }
+    html{ scroll-behavior:smooth; }
+    body{
+      font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(41,151,255,0.14), transparent 25%),
+        radial-gradient(circle at top right, rgba(124,58,237,0.15), transparent 25%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+      transition:.35s ease;
+    }
+    a{ color:inherit; text-decoration:none; }
+    .container{ width:min(1200px,92%); margin:auto; }
+
+    .blur-orb{
+      position:fixed;
+      width:320px;height:320px;border-radius:50%;
+      filter:blur(80px); opacity:.18; z-index:-1; pointer-events:none;
+      animation:floatOrb 12s ease-in-out infinite alternate;
+    }
+    .orb-1{ background:#2997ff; top:8%; left:-5%; }
+    .orb-2{ background:#7c3aed; top:45%; right:-8%; animation-delay:2s; }
+    .orb-3{ background:#ff3b30; bottom:0; left:35%; animation-delay:4s; }
+    @keyframes floatOrb{
+      from{ transform:translateY(0) translateX(0) scale(1); }
+      to{ transform:translateY(30px) translateX(20px) scale(1.1); }
+    }
+
+    header{
+      position:sticky; top:0; z-index:1000;
+      backdrop-filter:blur(18px);
+      background:rgba(10,10,12,0.5);
+      border-bottom:1px solid var(--line);
+    }
+    body.light header{ background:rgba(255,255,255,0.72); }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      min-height:72px; gap:20px;
+    }
+    .logo{
+      font-size:1.4rem; font-weight:800; letter-spacing:3px;
+      background:var(--grad);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+    .nav-links{ display:flex; gap:24px; align-items:center; }
+    .nav-links a{ color:var(--muted); font-size:.95rem; transition:.3s; }
+    .nav-links a:hover, .nav-links a.active{ color:var(--text); }
+    .nav-actions{ display:flex; align-items:center; gap:12px; }
+
+    .icon-btn, .primary-btn, .ghost-btn{
+      border:1px solid var(--line);
+      background:var(--bg-soft);
+      color:var(--text);
+      cursor:pointer;
+      transition:.3s ease;
+    }
+    .icon-btn{
+      width:44px;height:44px;border-radius:50%;
+      display:grid;place-items:center;font-size:1rem;
+    }
+    .primary-btn, .ghost-btn{
+      padding:12px 20px;border-radius:999px;font-weight:600;
+    }
+    .primary-btn{
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      border:none;color:#fff;
+    }
+    .ghost-btn:hover, .primary-btn:hover, .icon-btn:hover{
+      transform:translateY(-2px);
+      box-shadow:var(--shadow);
+    }
+    .mobile-toggle{ display:none; }
+
+    .page-hero{
+      padding:72px 0 28px;
+    }
+    .breadcrumb{
+      color:var(--muted);
+      margin-bottom:14px;
+      font-size:.95rem;
+    }
+    .page-hero h1{
+      font-size:clamp(2.2rem,5vw,4rem);
+      line-height:1.04;
+      letter-spacing:-1.5px;
+      margin-bottom:14px;
+    }
+    .page-hero p{
+      max-width:760px;
+      color:var(--muted);
+      line-height:1.8;
+      font-size:1.03rem;
+    }
+
+    .checkout-grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:28px;
+      padding:20px 0 90px;
+      align-items:start;
+    }
+    .panel{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:30px;
+      backdrop-filter:blur(16px);
+      box-shadow:var(--shadow);
+    }
+    .left-panel{
+      padding:26px;
+      display:grid;
+      gap:22px;
+    }
+    .section-card{
+      padding:22px;
+      border-radius:24px;
+      background:rgba(255,255,255,0.03);
+      border:1px solid var(--line);
+    }
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .section-title h2{
+      font-size:1.2rem;
+      letter-spacing:-.3px;
+    }
+    .step-badge{
+      width:36px;height:36px;border-radius:50%;
+      display:grid;place-items:center;
+      background:linear-gradient(135deg, rgba(41,151,255,.22), rgba(124,58,237,.25));
+      border:1px solid var(--line);
+      font-weight:700;
+    }
+    .input-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+    .field{ display:flex; flex-direction:column; gap:8px; }
+    .field.full{ grid-column:1 / -1; }
+    label{
+      font-size:.92rem;
+      color:var(--muted);
+      font-weight:600;
+    }
+    input, select, textarea{
+      width:100%;
+      padding:15px 16px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,0.06);
+      color:var(--text);
+      outline:none;
+      transition:.25s ease;
+      font:inherit;
+    }
+    body.light input, body.light select, body.light textarea{
+      background:rgba(255,255,255,0.85);
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color:rgba(41,151,255,.7);
+      box-shadow:0 0 0 4px rgba(41,151,255,.12);
+    }
+    textarea{ min-height:110px; resize:vertical; }
+
+    .radio-grid, .payment-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+    }
+    .choice{
+      position:relative;
+    }
+    .choice input{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      cursor:pointer;
+    }
+    .choice-box{
+      border:1px solid var(--line);
+      border-radius:22px;
+      background:rgba(255,255,255,0.04);
+      padding:18px;
+      min-height:110px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:8px;
+      transition:.25s ease;
+    }
+    .choice input:checked + .choice-box{
+      border-color:rgba(41,151,255,.7);
+      box-shadow:0 0 0 4px rgba(41,151,255,.10);
+      transform:translateY(-2px);
+    }
+    .choice-box strong{ font-size:1rem; }
+    .choice-box span{ color:var(--muted); line-height:1.5; font-size:.92rem; }
+
+    .mini-note{
+      margin-top:14px;
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.7;
+    }
+
+    .summary-panel{
+      padding:24px;
+      position:sticky;
+      top:96px;
+    }
+    .summary-panel h2{
+      font-size:2rem;
+      margin-bottom:18px;
+      letter-spacing:-1px;
+    }
+    .cart-items{
+      display:grid;
+      gap:14px;
+      margin-bottom:22px;
+      max-height:320px;
+      overflow:auto;
+      padding-right:4px;
+    }
+    .cart-item{
+      display:grid;
+      grid-template-columns:64px 1fr auto;
+      gap:14px;
+      align-items:center;
+      padding:14px;
+      border-radius:20px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid var(--line);
+    }
+    .cart-thumb{
+      width:64px;height:64px;border-radius:18px;
+      background:linear-gradient(145deg,#1d4ed8,#7c3aed,#ec4899);
+      opacity:.95;
+    }
+    .cart-item h4{ margin-bottom:4px; font-size:1rem; }
+    .cart-item p{ color:var(--muted); font-size:.92rem; }
+    .price{ font-weight:800; }
+
+    .summary-line{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding:16px 0;
+      border-bottom:1px solid var(--line);
+      color:var(--muted);
+      font-size:1rem;
+    }
+    .summary-line strong{
+      color:var(--text);
+      font-size:1.05rem;
+    }
+    .coupon-row{
+      display:flex;
+      gap:12px;
+      margin:20px 0 16px;
+    }
+    .coupon-row input{
+      border-radius:999px;
+    }
+    .coupon-row button{
+      padding:0 20px;
+      border-radius:999px;
+      min-width:98px;
+    }
+
+    .action-stack{
+      display:grid;
+      gap:12px;
+      margin-top:18px;
+    }
+    .secure-box{
+      margin-top:16px;
+      padding:16px 18px;
+      border-radius:20px;
+      background:rgba(31,209,125,.08);
+      border:1px solid rgba(31,209,125,.24);
+      color:#c9ffe0;
+      line-height:1.7;
+      font-size:.94rem;
+    }
+    body.light .secure-box{ color:#0f5132; }
+
+    .empty-state{
+      padding:18px;
+      border-radius:22px;
+      border:1px dashed var(--line);
+      color:var(--muted);
+      text-align:center;
+      line-height:1.7;
+    }
+    .success-message{
+      display:none;
+      margin-top:18px;
+      padding:16px 18px;
+      border-radius:20px;
+      background:rgba(31,209,125,.09);
+      border:1px solid rgba(31,209,125,.24);
+      color:#d7ffea;
+      line-height:1.7;
+    }
+    body.light .success-message{ color:#0f5132; }
+
+    .footer-help{
+      padding:0 0 60px;
+    }
+    .help-box{
+      padding:22px;
+      border-radius:24px;
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .help-box p{
+      color:var(--muted);
+      line-height:1.7;
+      max-width:760px;
+    }
+
+    @media (max-width:1024px){
+      .checkout-grid{ grid-template-columns:1fr; }
+      .summary-panel{ position:static; }
+      .radio-grid, .payment-grid{ grid-template-columns:1fr; }
+    }
+    @media (max-width:768px){
+      .nav-links{
+        position:absolute; top:72px; left:0; right:0;
+        background:rgba(8,8,8,.95);
+        border-bottom:1px solid var(--line);
+        backdrop-filter:blur(20px);
+        padding:18px 4%;
+        display:none;
+        flex-direction:column;
+        align-items:flex-start;
+      }
+      body.light .nav-links{ background:rgba(255,255,255,.95); }
+      .nav-links.show{ display:flex; }
+      .mobile-toggle{ display:grid; }
+      .input-grid{ grid-template-columns:1fr; }
+      .page-hero{ padding-top:50px; }
+      .summary-panel h2{ font-size:1.6rem; }
+      .coupon-row{ flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="blur-orb orb-1"></div>
+  <div class="blur-orb orb-2"></div>
+  <div class="blur-orb orb-3"></div>
+
+  <header>
+    <div class="container nav">
+      <a href="index.html" class="logo">LUXORA</a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="products.html">Products</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="cart.html" class="active">Cart</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="icon-btn" id="themeToggle" title="Theme Toggle">◐</button>
+        <button class="icon-btn mobile-toggle" id="mobileToggle">☰</button>
+        <a href="cart.html" class="ghost-btn">Back to Cart</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb">Cart / Checkout</div>
+      <h1>Complete your premium order experience.</h1>
+      <p>
+        Fill in delivery address, contact details, shipping preference, and payment method.
+        This page is fully styled to match your LUXORA theme and also reads cart data from <b>localStorage</b>.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="container checkout-grid">
+      <div class="panel left-panel">
+        <form id="checkoutForm">
+          <div class="section-card">
+            <div class="section-title">
+              <h2>Contact Details</h2>
+              <div class="step-badge">1</div>
+            </div>
+            <div class="input-grid">
+              <div class="field">
+                <label for="firstName">First Name</label>
+                <input id="firstName" name="firstName" type="text" placeholder="Krish" required />
+              </div>
+              <div class="field">
+                <label for="lastName">Last Name</label>
+                <input id="lastName" name="lastName" type="text" placeholder="Patel" required />
+              </div>
+              <div class="field">
+                <label for="email">Email Address</label>
+                <input id="email" name="email" type="email" placeholder="you@example.com" required />
+              </div>
+              <div class="field">
+                <label for="phone">Phone Number</label>
+                <input id="phone" name="phone" type="tel" placeholder="+91 98765 43210" required />
+              </div>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-title">
+              <h2>Shipping Address</h2>
+              <div class="step-badge">2</div>
+            </div>
+            <div class="input-grid">
+              <div class="field full">
+                <label for="address1">Address Line 1</label>
+                <input id="address1" name="address1" type="text" placeholder="House no, street, area" required />
+              </div>
+              <div class="field full">
+                <label for="address2">Address Line 2</label>
+                <input id="address2" name="address2" type="text" placeholder="Landmark, apartment, optional" />
+              </div>
+              <div class="field">
+                <label for="city">City</label>
+                <input id="city" name="city" type="text" placeholder="Bhavnagar" required />
+              </div>
+              <div class="field">
+                <label for="state">State</label>
+                <input id="state" name="state" type="text" placeholder="Gujarat" required />
+              </div>
+              <div class="field">
+                <label for="pincode">Pincode</label>
+                <input id="pincode" name="pincode" type="text" placeholder="364001" required />
+              </div>
+              <div class="field">
+                <label for="country">Country</label>
+                <select id="country" name="country" required>
+                  <option value="India" selected>India</option>
+                  <option value="United States">United States</option>
+                  <option value="United Kingdom">United Kingdom</option>
+                  <option value="Canada">Canada</option>
+                  <option value="Australia">Australia</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-title">
+              <h2>Delivery Preference</h2>
+              <div class="step-badge">3</div>
+            </div>
+            <div class="radio-grid">
+              <label class="choice">
+                <input type="radio" name="shipping" value="Standard Delivery" checked />
+                <div class="choice-box">
+                  <strong>Standard</strong>
+                  <span>3-5 business days<br>Free on premium orders</span>
+                </div>
+              </label>
+              <label class="choice">
+                <input type="radio" name="shipping" value="Express Delivery" />
+                <div class="choice-box">
+                  <strong>Express</strong>
+                  <span>1-2 business days<br>₹499 shipping charge</span>
+                </div>
+              </label>
+              <label class="choice">
+                <input type="radio" name="shipping" value="Store Pickup" />
+                <div class="choice-box">
+                  <strong>Store Pickup</strong>
+                  <span>Pick from store<br>No delivery charge</span>
+                </div>
+              </label>
+            </div>
+            <div class="mini-note">Choose the option that best fits your delivery timeline.</div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-title">
+              <h2>Payment Method</h2>
+              <div class="step-badge">4</div>
+            </div>
+            <div class="payment-grid">
+              <label class="choice">
+                <input type="radio" name="payment" value="Card Payment" checked />
+                <div class="choice-box">
+                  <strong>Credit / Debit Card</strong>
+                  <span>Fast and secure online card payment</span>
+                </div>
+              </label>
+              <label class="choice">
+                <input type="radio" name="payment" value="UPI Payment" />
+                <div class="choice-box">
+                  <strong>UPI</strong>
+                  <span>Pay instantly using any supported UPI app</span>
+                </div>
+              </label>
+              <label class="choice">
+                <input type="radio" name="payment" value="Cash on Delivery" />
+                <div class="choice-box">
+                  <strong>Cash on Delivery</strong>
+                  <span>Pay at your doorstep after delivery</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-title">
+              <h2>Additional Notes</h2>
+              <div class="step-badge">5</div>
+            </div>
+            <div class="field">
+              <label for="notes">Order Notes</label>
+              <textarea id="notes" name="notes" placeholder="Write special instructions, best delivery time, landmark, gift note, etc."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <aside class="panel summary-panel">
+        <h2>Order Summary</h2>
+        <div id="cartItems" class="cart-items"></div>
+
+        <div class="summary-line">
+          <span>Subtotal</span>
+          <strong id="subtotal">₹0</strong>
+        </div>
+        <div class="summary-line">
+          <span>Shipping</span>
+          <strong id="shippingCost">₹0</strong>
+        </div>
+        <div class="summary-line">
+          <span>Discount</span>
+          <strong id="discountValue">-₹0</strong>
+        </div>
+        <div class="summary-line" style="border-bottom:none; padding-bottom:8px;">
+          <span>Total</span>
+          <strong id="grandTotal">₹0</strong>
+        </div>
+
+        <div class="coupon-row">
+          <input id="couponInput" type="text" placeholder="Enter coupon code" />
+          <button class="icon-btn" id="applyCouponBtn" type="button" title="Apply">Apply</button>
+        </div>
+
+        <div class="action-stack">
+          <button class="primary-btn" id="placeOrderBtn" type="button">Place Order</button>
+          <a href="cart.html" class="ghost-btn" style="text-align:center;">Edit Cart</a>
+        </div>
+
+        <div class="secure-box">
+          Secure checkout enabled. Demo coupon: <b>LUXORA10</b> gives 10% off.
+        </div>
+
+        <div class="success-message" id="successMessage"></div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="footer-help">
+    <div class="container">
+      <div class="help-box">
+        <div>
+          <h3 style="margin-bottom:8px;">How to connect this page</h3>
+          <p>
+            In your <b>cart.html</b>, set the Proceed to Checkout button link or click action to open
+            <b>checkout.html</b>. This file already reads products from <b>luxora-cart</b> in localStorage and saves the final order into <b>luxora-last-order</b>.
+          </p>
+        </div>
+        <a href="contact.html" class="primary-btn">Need Help?</a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (mobileToggle) {
+      mobileToggle.addEventListener('click', () => navLinks.classList.toggle('show'));
+    }
+
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('luxora-theme');
+    if (savedTheme === 'light') document.body.classList.add('light');
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light');
+      localStorage.setItem('luxora-theme', document.body.classList.contains('light') ? 'light' : 'dark');
+    });
+
+    const cartItemsBox = document.getElementById('cartItems');
+    const subtotalEl = document.getElementById('subtotal');
+    const shippingCostEl = document.getElementById('shippingCost');
+    const discountValueEl = document.getElementById('discountValue');
+    const grandTotalEl = document.getElementById('grandTotal');
+    const couponInput = document.getElementById('couponInput');
+    const applyCouponBtn = document.getElementById('applyCouponBtn');
+    const placeOrderBtn = document.getElementById('placeOrderBtn');
+    const successMessage = document.getElementById('successMessage');
+    const checkoutForm = document.getElementById('checkoutForm');
+
+    let discount = 0;
+    let shippingCharge = 0;
+
+    function formatINR(value) {
+      return '₹' + Number(value).toLocaleString('en-IN');
+    }
+
+    function getCart() {
+      return JSON.parse(localStorage.getItem('luxora-cart') || '[]');
+    }
+
+    function getSelectedShipping() {
+      return document.querySelector('input[name="shipping"]:checked')?.value || 'Standard Delivery';
+    }
+
+    function calculateShipping(subtotal) {
+      const shippingType = getSelectedShipping();
+      if (shippingType === 'Express Delivery') return 499;
+      if (shippingType === 'Store Pickup') return 0;
+      return subtotal >= 50000 ? 0 : 199;
+    }
+
+    function renderCart() {
+      const cart = getCart();
+      cartItemsBox.innerHTML = '';
+
+      if (!cart.length) {
+        cartItemsBox.innerHTML = `
+          <div class="empty-state">
+            Your cart is empty.<br>
+            Add products first, then return to checkout.
+          </div>
+        `;
+      } else {
+        cart.forEach((item, index) => {
+          const qty = Number(item.qty || 1);
+          const price = Number(item.price || 0);
+          const itemTotal = qty * price;
+
+          const card = document.createElement('div');
+          card.className = 'cart-item';
+          card.innerHTML = `
+            <div class="cart-thumb"></div>
+            <div>
+              <h4>${item.name || 'Premium Product'}</h4>
+              <p>Qty: ${qty} × ${formatINR(price)}</p>
+            </div>
+            <div class="price">${formatINR(itemTotal)}</div>
+          `;
+          cartItemsBox.appendChild(card);
+        });
+      }
+
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const cart = getCart();
+      const subtotal = cart.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.qty || 1), 0);
+      shippingCharge = calculateShipping(subtotal);
+      const total = Math.max(0, subtotal + shippingCharge - discount);
+
+      subtotalEl.textContent = formatINR(subtotal);
+      shippingCostEl.textContent = formatINR(shippingCharge);
+      discountValueEl.textContent = '-'+ formatINR(discount);
+      grandTotalEl.textContent = formatINR(total);
+    }
+
+    applyCouponBtn.addEventListener('click', () => {
+      const cart = getCart();
+      const subtotal = cart.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.qty || 1), 0);
+      const code = couponInput.value.trim().toUpperCase();
+
+      if (!code) {
+        alert('Please enter a coupon code.');
+        return;
+      }
+
+      if (code === 'LUXORA10') {
+        discount = Math.round(subtotal * 0.10);
+        alert('Coupon applied successfully.');
+      } else {
+        discount = 0;
+        alert('Invalid coupon code.');
+      }
+      updateSummary();
+    });
+
+    document.querySelectorAll('input[name="shipping"]').forEach(input => {
+      input.addEventListener('change', updateSummary);
+    });
+
+    placeOrderBtn.addEventListener('click', () => {
+      const cart = getCart();
+      if (!cart.length) {
+        alert('Your cart is empty. Please add products first.');
+        return;
+      }
+
+      if (!checkoutForm.reportValidity()) {
+        return;
+      }
+
+      const formData = new FormData(checkoutForm);
+      const orderData = {
+        customer: {
+          firstName: formData.get('firstName'),
+          lastName: formData.get('lastName'),
+          email: formData.get('email'),
+          phone: formData.get('phone')
+        },
+        address: {
+          address1: formData.get('address1'),
+          address2: formData.get('address2'),
+          city: formData.get('city'),
+          state: formData.get('state'),
+          pincode: formData.get('pincode'),
+          country: formData.get('country')
+        },
+        shipping: formData.get('shipping'),
+        payment: formData.get('payment'),
+        notes: formData.get('notes'),
+        items: cart,
+        pricing: {
+          subtotal: subtotalEl.textContent,
+          shipping: shippingCostEl.textContent,
+          discount: discountValueEl.textContent,
+          total: grandTotalEl.textContent
+        },
+        createdAt: new Date().toISOString()
+      };
+
+      localStorage.setItem('luxora-last-order', JSON.stringify(orderData));
+      localStorage.removeItem('luxora-cart');
+
+      successMessage.style.display = 'block';
+      successMessage.innerHTML = `
+        <b>Order placed successfully.</b><br>
+        Thank you, ${orderData.customer.firstName}. Your order has been saved in localStorage as <b>luxora-last-order</b>.
+        You can now create a thank-you page or order tracking page using this saved data.
+      `;
+
+      renderCart();
+      checkoutForm.reset();
+      document.querySelector('input[name="shipping"][value="Standard Delivery"]').checked = true;
+      document.querySelector('input[name="payment"][value="Card Payment"]').checked = true;
+      discount = 0;
+      couponInput.value = '';
+      updateSummary();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    renderCart();
+  </script>
+</body>
+</html>

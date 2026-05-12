@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart | LUXORA</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#080808;
+      --text:#f5f5f7;
+      --muted:#b8b8c2;
+      --line:rgba(255,255,255,.1);
+      --card:rgba(255,255,255,.08);
+      --soft:rgba(255,255,255,.06);
+      --accent:#2997ff;
+      --accent2:#7c3aed;
+      --danger:#ff5a67;
+      --shadow:0 20px 50px rgba(0,0,0,.35);
+      --grad:linear-gradient(135deg,#0ea5e9,#7c3aed,#f43f5e);
+    }
+
+    body.light{
+      --bg:#f5f7fb;
+      --text:#101114;
+      --muted:#5f6470;
+      --line:rgba(0,0,0,.08);
+      --card:rgba(255,255,255,.82);
+      --soft:rgba(255,255,255,.75);
+      --accent:#0071e3;
+      --accent2:#6d28d9;
+      --danger:#e63946;
+      --shadow:0 18px 45px rgba(0,0,0,.08);
+      --grad:linear-gradient(135deg,#0ea5e9,#2563eb,#7c3aed);
+    }
+
+    body{
+      font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(41,151,255,.12), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(124,58,237,.12), transparent 24%),
+        var(--bg);
+      color:var(--text);
+      transition:.35s ease;
+      overflow-x:hidden;
+    }
+
+    a{text-decoration:none;color:inherit}
+    .container{width:min(1180px,92%);margin:auto}
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:1000;
+      background:rgba(10,10,12,.58);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
+    body.light header{background:rgba(255,255,255,.75)}
+
+    .nav{
+      min-height:72px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:18px;
+    }
+
+    .logo{
+      font-size:1.4rem;
+      font-weight:800;
+      letter-spacing:3px;
+      background:var(--grad);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+
+    .nav-links{display:flex;gap:22px;align-items:center}
+    .nav-links a{color:var(--muted);transition:.3s}
+    .nav-links a.active,.nav-links a:hover{color:var(--text)}
+
+    .actions{display:flex;gap:10px;align-items:center}
+    .icon-btn,.btn{
+      border:1px solid var(--line);
+      background:var(--soft);
+      color:var(--text);
+      cursor:pointer;
+      transition:.3s ease;
+    }
+    .icon-btn{
+      width:42px;height:42px;border-radius:50%;
+      display:grid;place-items:center
+    }
+    .btn{
+      padding:11px 18px;
+      border-radius:999px;
+      font-weight:600;
+    }
+    .btn.primary{
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#fff;
+      border:none;
+    }
+    .btn.danger{
+      background:rgba(255,90,103,.12);
+      border:1px solid rgba(255,90,103,.25);
+      color:#fff;
+    }
+    body.light .btn.danger{
+      color:var(--danger);
+    }
+
+    .hero{
+      text-align:center;
+      padding:88px 0 30px;
+    }
+    .hero .tag{
+      display:inline-block;
+      padding:10px 16px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:var(--soft);
+      color:var(--muted);
+      margin-bottom:20px;
+      font-size:.9rem;
+    }
+    .hero h1{
+      font-size:clamp(2.4rem,5vw,4.8rem);
+      letter-spacing:-2px;
+      margin-bottom:16px;
+      line-height:1.05;
+    }
+    .hero p{
+      max-width:780px;
+      margin:auto;
+      color:var(--muted);
+      line-height:1.9;
+      font-size:1.04rem;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:24px;
+      padding:24px 0 80px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:30px;
+      padding:26px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(12px);
+    }
+
+    .cart-list{
+      display:grid;
+      gap:16px;
+    }
+
+    .cart-item{
+      display:grid;
+      grid-template-columns:110px 1fr auto;
+      gap:18px;
+      align-items:center;
+      padding:18px;
+      border-radius:24px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+    }
+
+    .item-visual{
+      width:110px;
+      height:110px;
+      border-radius:28px;
+      background:linear-gradient(145deg,#dbeafe,#93c5fd,#a78bfa);
+      box-shadow:0 18px 30px rgba(0,0,0,.24);
+    }
+
+    .item-info h3{
+      font-size:1.15rem;
+      margin-bottom:8px;
+    }
+    .item-info p{
+      color:var(--muted);
+      margin-bottom:10px;
+      line-height:1.7;
+    }
+    .qty-row{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .qty-btn{
+      width:34px;
+      height:34px;
+      border-radius:50%;
+      border:1px solid var(--line);
+      background:var(--soft);
+      color:var(--text);
+      cursor:pointer;
+      font-size:1rem;
+    }
+
+    .price-side{
+      text-align:right;
+    }
+    .price-side strong{
+      display:block;
+      font-size:1.18rem;
+      margin-bottom:12px;
+    }
+
+    .summary h2{
+      font-size:1.8rem;
+      margin-bottom:18px;
+      letter-spacing:-1px;
+    }
+
+    .summary-line{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:14px 0;
+      border-bottom:1px solid var(--line);
+      color:var(--muted);
+    }
+    .summary-line strong{
+      color:var(--text);
+    }
+
+    .coupon{
+      display:flex;
+      gap:10px;
+      margin:20px 0;
+      flex-wrap:wrap;
+    }
+
+    .coupon input{
+      flex:1;
+      min-width:180px;
+      padding:14px 16px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      outline:none;
+    }
+
+    .checkout{
+      margin-top:22px;
+      display:grid;
+      gap:12px;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:34px 20px;
+      border:1px dashed var(--line);
+      border-radius:24px;
+    }
+
+    .mini-note{
+      margin-top:12px;
+      font-size:.93rem;
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    footer{
+      padding:0 0 40px;
+      color:var(--muted);
+      text-align:center;
+      border-top:1px solid var(--line);
+    }
+    footer .container{padding-top:24px}
+
+    @media(max-width:980px){
+      .layout{grid-template-columns:1fr}
+    }
+
+    @media(max-width:760px){
+      .nav{flex-wrap:wrap;padding:12px 0}
+      .nav-links{width:100%;justify-content:center;flex-wrap:wrap}
+      .cart-item{
+        grid-template-columns:1fr;
+        text-align:left;
+      }
+      .item-visual{width:100%;height:160px}
+      .price-side{text-align:left}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a href="index.html" class="logo">LUXORA</a>
+
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="products.html">Products</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="cart.html" class="active">Cart</a>
+      </nav>
+
+      <div class="actions">
+        <button class="icon-btn" id="themeToggle">◐</button>
+        <a href="products.html" class="btn primary">Continue Shopping</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="tag">Your premium cart</div>
+      <h1>Shopping Cart</h1>
+      <p>
+        Review your selected products, adjust quantities, apply a coupon, and continue toward
+        a smooth premium checkout experience.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="container layout">
+      <div class="card">
+        <div id="cartContainer" class="cart-list"></div>
+      </div>
+
+      <div class="card summary">
+        <h2>Order Summary</h2>
+
+        <div class="summary-line">
+          <span>Subtotal</span>
+          <strong id="subtotal">₹0</strong>
+        </div>
+        <div class="summary-line">
+          <span>Shipping</span>
+          <strong id="shipping">₹0</strong>
+        </div>
+        <div class="summary-line">
+          <span>Discount</span>
+          <strong id="discount">₹0</strong>
+        </div>
+        <div class="summary-line" style="border-bottom:none;font-size:1.05rem;">
+          <span>Total</span>
+          <strong id="total">₹0</strong>
+        </div>
+
+        <div class="coupon">
+          <input type="text" id="couponInput" placeholder="Enter coupon code">
+          <button class="btn" id="applyCouponBtn">Apply</button>
+        </div>
+
+        <div class="checkout">
+          <button class="btn primary" id="checkoutBtn">Proceed to Checkout</button>
+          <button class="btn danger" id="clearCartBtn">Clear Cart</button>
+        </div>
+
+        <p class="mini-note">
+          Demo coupon: use <strong>LUXORA10</strong> for 10% discount.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      © 2026 LUXORA — Premium cart experience with localStorage support.
+    </div>
+  </footer>
+
+  <script>
+    const savedTheme = localStorage.getItem('luxora-theme');
+    if(savedTheme === 'light') document.body.classList.add('light');
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      document.body.classList.toggle('light');
+      localStorage.setItem('luxora-theme', document.body.classList.contains('light') ? 'light' : 'dark');
+    });
+
+    const cartContainer = document.getElementById('cartContainer');
+    const subtotalEl = document.getElementById('subtotal');
+    const shippingEl = document.getElementById('shipping');
+    const discountEl = document.getElementById('discount');
+    const totalEl = document.getElementById('total');
+    const couponInput = document.getElementById('couponInput');
+
+    let appliedDiscount = 0;
+
+    function getCart(){
+      return JSON.parse(localStorage.getItem('luxora-cart') || '[]');
+    }
+
+    function saveCart(cart){
+      localStorage.setItem('luxora-cart', JSON.stringify(cart));
+    }
+
+    function formatINR(value){
+      return '₹' + value.toLocaleString('en-IN');
+    }
+
+    function renderCart(){
+      const cart = getCart();
+
+      if(!cart.length){
+        cartContainer.innerHTML = `
+          <div class="empty">
+            <h3 style="margin-bottom:10px;color:var(--text)">Your cart is empty</h3>
+            <p>No premium products added yet. Start exploring the collection.</p>
+            <div style="margin-top:18px">
+              <a href="products.html" class="btn primary">Go to Products</a>
+            </div>
+          </div>
+        `;
+        updateSummary();
+        return;
+      }
+
+      cartContainer.innerHTML = cart.map((item, index) => `
+        <div class="cart-item">
+          <div class="item-visual"></div>
+
+          <div class="item-info">
+            <h3>${item.name}</h3>
+            <p>Premium product selected for your curated shopping experience.</p>
+            <div class="qty-row">
+              <button class="qty-btn" onclick="changeQty(${index}, -1)">−</button>
+              <span>Qty: <strong>${item.qty || 1}</strong></span>
+              <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
+            </div>
+          </div>
+
+          <div class="price-side">
+            <strong>${formatINR((item.price || 0) * (item.qty || 1))}</strong>
+            <button class="btn danger" onclick="removeItem(${index})">Remove</button>
+          </div>
+        </div>
+      `).join('');
+
+      updateSummary();
+    }
+
+    function changeQty(index, delta){
+      const cart = getCart();
+      if(!cart[index].qty) cart[index].qty = 1;
+      cart[index].qty += delta;
+
+      if(cart[index].qty <= 0){
+        cart.splice(index, 1);
+      }
+
+      saveCart(cart);
+      renderCart();
+    }
+
+    function removeItem(index){
+      const cart = getCart();
+      cart.splice(index, 1);
+      saveCart(cart);
+      renderCart();
+    }
+
+    function updateSummary(){
+      const cart = getCart();
+      const subtotal = cart.reduce((sum, item) => sum + (item.price || 0) * (item.qty || 1), 0);
+      const shipping = subtotal > 0 ? 499 : 0;
+      const discount = Math.round(subtotal * appliedDiscount);
+      const total = subtotal + shipping - discount;
+
+      subtotalEl.textContent = formatINR(subtotal);
+      shippingEl.textContent = formatINR(shipping);
+      discountEl.textContent = '-' + formatINR(discount);
+      totalEl.textContent = formatINR(total > 0 ? total : 0);
+    }
+
+    document.getElementById('applyCouponBtn').addEventListener('click', () => {
+      const code = couponInput.value.trim().toUpperCase();
+
+      if(code === 'LUXORA10'){
+        appliedDiscount = 0.10;
+        alert('Coupon applied successfully: 10% off');
+      } else if(code === ''){
+        appliedDiscount = 0;
+        alert('Please enter a coupon code.');
+      } else {
+        appliedDiscount = 0;
+        alert('Invalid coupon code.');
+      }
+
+      updateSummary();
+    });
+
+    document.getElementById('clearCartBtn').addEventListener('click', () => {
+      localStorage.removeItem('luxora-cart');
+      appliedDiscount = 0;
+      couponInput.value = '';
+      renderCart();
+    });
+
+    document.getElementById('checkoutBtn').addEventListener('click', () => {
+      const cart = getCart();
+      if(!cart.length){
+        alert('Your cart is empty.');
+        return;
+      }
+      window.location.href = 'checkout.html';
+    });
+
+    renderCart();
+  </script>
+</body>
+</html>
