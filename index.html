@@ -1,0 +1,985 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LUXORA | Premium Tech Store</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #080808;
+      --bg-soft: rgba(255,255,255,0.06);
+      --card: rgba(255,255,255,0.08);
+      --text: #f5f5f7;
+      --muted: #b8b8c2;
+      --line: rgba(255,255,255,0.1);
+      --accent: #2997ff;
+      --accent-2: #7c3aed;
+      --success: #1fd17d;
+      --shadow: 0 20px 60px rgba(0,0,0,0.4);
+      --grad: linear-gradient(135deg, #0ea5e9, #7c3aed, #f43f5e);
+    }
+
+    body.light {
+      --bg: #f5f7fb;
+      --bg-soft: rgba(255,255,255,0.7);
+      --card: rgba(255,255,255,0.75);
+      --text: #101114;
+      --muted: #5f6470;
+      --line: rgba(0,0,0,0.08);
+      --accent: #0071e3;
+      --accent-2: #6d28d9;
+      --shadow: 0 20px 50px rgba(0,0,0,0.08);
+      --grad: linear-gradient(135deg, #0ea5e9, #2563eb, #7c3aed);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(41,151,255,0.14), transparent 25%),
+        radial-gradient(circle at top right, rgba(124,58,237,0.15), transparent 25%),
+        var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      transition: 0.35s ease;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .container { width: min(1200px, 92%); margin: auto; }
+
+    .blur-orb {
+      position: fixed;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.18;
+      z-index: -1;
+      pointer-events: none;
+      animation: floatOrb 12s ease-in-out infinite alternate;
+    }
+    .orb-1 { background: #2997ff; top: 8%; left: -5%; }
+    .orb-2 { background: #7c3aed; top: 45%; right: -8%; animation-delay: 2s; }
+    .orb-3 { background: #ff3b30; bottom: 0; left: 35%; animation-delay: 4s; }
+    @keyframes floatOrb {
+      from { transform: translateY(0) translateX(0) scale(1); }
+      to { transform: translateY(30px) translateX(20px) scale(1.1); }
+    }
+
+    .loader {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: #000;
+      z-index: 9999;
+      transition: 0.6s ease;
+    }
+    .loader.hide { opacity: 0; visibility: hidden; }
+    .loader-inner { text-align: center; }
+    .loader-ring {
+      width: 90px; height: 90px; border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.15);
+      border-top-color: #fff;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+    .loader p { color: #fff; letter-spacing: 4px; font-size: 0.9rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    header {
+      position: sticky; top: 0; z-index: 1000;
+      backdrop-filter: blur(18px);
+      background: rgba(10,10,12,0.5);
+      border-bottom: 1px solid var(--line);
+    }
+    body.light header { background: rgba(255,255,255,0.72); }
+
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      min-height: 72px;
+      gap: 20px;
+    }
+    .logo {
+      font-size: 1.4rem; font-weight: 800; letter-spacing: 3px;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-links {
+      display: flex; gap: 24px; align-items: center;
+    }
+    .nav-links a {
+      color: var(--muted); font-size: 0.95rem; transition: 0.3s;
+      position: relative;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .nav-actions {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .icon-btn, .primary-btn, .ghost-btn {
+      border: 1px solid var(--line);
+      background: var(--bg-soft);
+      color: var(--text);
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+    .icon-btn {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: grid; place-items: center; font-size: 1rem;
+    }
+    .icon-btn:hover, .primary-btn:hover, .ghost-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+    .primary-btn, .ghost-btn {
+      padding: 12px 20px; border-radius: 999px; font-weight: 600;
+    }
+    .primary-btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border: none;
+      color: white;
+    }
+
+    .mobile-toggle { display: none; }
+
+    .hero {
+      min-height: 94vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      align-items: center;
+      gap: 40px;
+      padding: 60px 0;
+    }
+    .hero-text .tag {
+      display: inline-flex;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: var(--bg-soft);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-bottom: 24px;
+      animation: fadeUp 1s ease 0.1s both;
+    }
+    .hero h1 {
+      font-size: clamp(2.8rem, 6vw, 6rem);
+      line-height: 1;
+      letter-spacing: -2px;
+      margin-bottom: 20px;
+      animation: fadeUp 1s ease 0.2s both;
+    }
+    .hero h1 span {
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      max-width: 620px;
+      font-size: 1.08rem;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 30px;
+      animation: fadeUp 1s ease 0.35s both;
+    }
+    .hero-actions {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      margin-bottom: 28px;
+      animation: fadeUp 1s ease 0.45s both;
+    }
+    .hero-stats {
+      display: flex; gap: 28px; flex-wrap: wrap;
+      animation: fadeUp 1s ease 0.55s both;
+    }
+    .hero-stats div h3 { font-size: 1.5rem; margin-bottom: 6px; }
+    .hero-stats div p { margin: 0; font-size: 0.9rem; }
+
+    .device-wrap {
+      position: relative;
+      perspective: 1000px;
+      animation: fadeUp 1.2s ease 0.4s both;
+    }
+    .device {
+      border-radius: 34px;
+      padding: 18px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: var(--shadow);
+      transform: rotateY(-16deg) rotateX(10deg);
+      transition: 0.4s ease;
+    }
+    .device:hover { transform: rotateY(-8deg) rotateX(4deg) translateY(-8px); }
+    .device-screen {
+      border-radius: 24px;
+      overflow: hidden;
+      background: linear-gradient(160deg, #07111d, #111827 60%, #0a0a0b);
+      min-height: 540px;
+      position: relative;
+      padding: 26px;
+    }
+    .device-top {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px;
+    }
+    .device-top .dots { display: flex; gap: 8px; }
+    .device-top span {
+      width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.25);
+    }
+    .mini-card {
+      padding: 18px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 16px;
+      backdrop-filter: blur(10px);
+    }
+    .mini-card h4 { font-size: 1rem; margin-bottom: 8px; }
+    .product-visual {
+      height: 220px;
+      border-radius: 28px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), transparent 20%), linear-gradient(135deg, #1d4ed8, #7c3aed, #ec4899);
+      margin: 18px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .product-visual::before, .product-visual::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      filter: blur(10px);
+    }
+    .product-visual::before { width: 150px; height: 150px; top: -20px; left: -20px; }
+    .product-visual::after { width: 140px; height: 140px; bottom: -20px; right: -10px; }
+
+    .section { padding: 100px 0; }
+    .section-head {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto 50px;
+    }
+    .section-head span {
+      display: inline-block;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+    }
+    .section-head h2 {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1.1;
+      margin-bottom: 14px;
+      letter-spacing: -1px;
+    }
+    .section-head p { color: var(--muted); line-height: 1.8; }
+
+    .features-grid, .products-grid, .testimonial-grid, .footer-grid {
+      display: grid;
+      gap: 22px;
+    }
+    .features-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .feature-card, .product-card, .testimonial-card, .glass-banner {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
+    .feature-card {
+      padding: 26px;
+      transition: 0.35s ease;
+    }
+    .feature-card:hover, .product-card:hover, .testimonial-card:hover {
+      transform: translateY(-8px);
+    }
+    .feature-icon {
+      width: 58px; height: 58px; border-radius: 18px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, rgba(41,151,255,0.18), rgba(124,58,237,0.25));
+      margin-bottom: 16px; font-size: 1.4rem;
+    }
+    .feature-card h3 { margin-bottom: 10px; }
+    .feature-card p { color: var(--muted); line-height: 1.7; }
+
+    .products-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .product-card {
+      overflow: hidden;
+      position: relative;
+    }
+    .product-img {
+      min-height: 250px;
+      background: linear-gradient(135deg, #111827, #0f172a, #1e1b4b);
+      display: grid; place-items: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .product-img::before {
+      content: "";
+      position: absolute;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(255,255,255,0.28), transparent 65%);
+      top: -20px; right: -10px;
+    }
+    .real-product-img {
+      width: 220px;
+      height: 220px;
+      object-fit: contain;
+      filter: drop-shadow(0 28px 40px rgba(0,0,0,0.42));
+      transition: transform 0.4s ease;
+      position: relative;
+      z-index: 1;
+    }
+    .product-card:hover .real-product-img {
+      transform: scale(1.08) rotate(-2deg);
+    }
+    .floating-product {
+      width: 210px; height: 210px;
+      border-radius: 38px;
+      background: linear-gradient(145deg, #dbeafe, #93c5fd, #a78bfa);
+      box-shadow: 0 30px 40px rgba(0,0,0,0.35);
+      transform: rotate(-14deg);
+      animation: floatProduct 5s ease-in-out infinite;
+    }
+    @keyframes floatProduct {
+      0%,100% { transform: rotate(-14deg) translateY(0); }
+      50% { transform: rotate(-11deg) translateY(-12px); }
+    }
+    .product-body { padding: 24px; }
+    .product-tag {
+      display: inline-block;
+      font-size: 0.78rem;
+      color: var(--accent);
+      background: rgba(41,151,255,0.1);
+      padding: 8px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .product-body h3 { font-size: 1.4rem; margin-bottom: 10px; }
+    .product-body p { color: var(--muted); line-height: 1.7; margin-bottom: 18px; }
+    .price-row {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    }
+    .price { font-size: 1.3rem; font-weight: 800; }
+
+    .showcase {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+    .glass-banner {
+      padding: 34px;
+      min-height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .glass-banner::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(255,255,255,0.12), transparent 35%);
+      pointer-events: none;
+    }
+    .glass-banner h3 {
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      margin-bottom: 16px;
+      letter-spacing: -1px;
+    }
+    .glass-banner p { color: var(--muted); line-height: 1.8; max-width: 580px; }
+    .specs {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .spec-box {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--line);
+    }
+    .spec-box h4 { font-size: 1.3rem; margin-bottom: 6px; }
+    .spec-box p { margin: 0; font-size: 0.9rem; }
+
+    .newsletter {
+      text-align: center;
+    }
+    .newsletter-box {
+      width: min(760px, 100%);
+      margin: 0 auto;
+      padding: 34px;
+      border-radius: 30px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .newsletter-form {
+      margin-top: 24px;
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+    }
+    .newsletter-form input {
+      width: min(420px, 100%);
+      padding: 16px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.07);
+      color: var(--text);
+      outline: none;
+    }
+
+    .testimonial-grid { grid-template-columns: repeat(3, 1fr); }
+    .testimonial-card { padding: 28px; }
+    .stars { color: gold; margin-bottom: 14px; }
+    .testimonial-card p { color: var(--muted); line-height: 1.8; margin-bottom: 18px; }
+    .user { display: flex; align-items: center; gap: 14px; }
+    .avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--grad);
+      display: grid; place-items: center;
+      color: white; font-weight: 700;
+    }
+
+    .faq-wrap {
+      display: grid;
+      gap: 14px;
+      width: min(900px, 100%);
+      margin: 0 auto;
+    }
+    .faq-item {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--card);
+      overflow: hidden;
+    }
+    .faq-question {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      text-align: left;
+      padding: 22px 24px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: 0.35s ease;
+      color: var(--muted);
+      line-height: 1.8;
+      padding: 0 24px;
+    }
+    .faq-item.active .faq-answer {
+      max-height: 180px;
+      padding: 0 24px 22px;
+    }
+
+    footer {
+      padding: 70px 0 28px;
+      border-top: 1px solid var(--line);
+      margin-top: 40px;
+    }
+    .footer-grid {
+      grid-template-columns: 1.2fr 1fr 1fr 1fr;
+      margin-bottom: 40px;
+    }
+    .footer-col p, .footer-col a {
+      color: var(--muted);
+      line-height: 1.9;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    .footer-col h4 { margin-bottom: 16px; }
+    .bottom-bar {
+      display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+    }
+
+    .cart-badge {
+      background: var(--accent);
+      color: white;
+      font-size: 0.72rem;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      display: inline-grid; place-items: center;
+      position: relative; top: -8px; left: -5px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: 0.8s ease;
+    }
+    .reveal.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1024px) {
+      .hero-grid,
+      .showcase,
+      .features-grid,
+      .products-grid,
+      .testimonial-grid,
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .hero-grid { grid-template-columns: 1fr; }
+      .showcase { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        position: absolute; top: 72px; left: 0; right: 0;
+        background: rgba(8,8,8,0.95);
+        border-bottom: 1px solid var(--line);
+        backdrop-filter: blur(20px);
+        padding: 18px 4%;
+        display: none;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      body.light .nav-links { background: rgba(255,255,255,0.95); }
+      .nav-links.show { display: flex; }
+      .mobile-toggle { display: grid; }
+      .features-grid,
+      .products-grid,
+      .testimonial-grid,
+      .footer-grid,
+      .specs { grid-template-columns: 1fr; }
+      .section { padding: 80px 0; }
+      .device-screen { min-height: 430px; }
+      .hero-stats { gap: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader" id="loader">
+    <div class="loader-inner">
+      <div class="loader-ring"></div>
+      <p>LUXORA</p>
+    </div>
+  </div>
+
+  <div class="blur-orb orb-1"></div>
+  <div class="blur-orb orb-2"></div>
+  <div class="blur-orb orb-3"></div>
+
+  <header>
+    <div class="container nav">
+      <a href="index.html" class="logo">LUXORA</a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="active">Home</a>
+        <a href="products.html">Products</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="icon-btn" id="themeToggle" title="Theme Toggle">◐</button>
+        <button class="icon-btn mobile-toggle" id="mobileToggle">☰</button>
+        <a href="cart.html" class="icon-btn" title="Cart">🛒</a>
+        <a href="products.html" class="primary-btn">Shop Now</a>
+        <a href="admin.html" class="ghost-btn">Admin Panel</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <div class="tag">Industry-level premium e-commerce experience</div>
+        <h1>Beautifully engineered <span>shopping</span> for modern premium tech.</h1>
+        <p>
+          Discover a high-end Apple-inspired shopping experience built using only HTML, CSS, and JavaScript.
+          Smooth animations, luxurious glassmorphism, premium sections, and conversion-focused design — all crafted for your project.
+        </p>
+        <div class="hero-actions">
+          <a href="products.html" class="primary-btn">Explore Collection</a>
+          <a href="#featured" class="ghost-btn">View Highlights</a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <h3>50K+</h3>
+            <p>Luxury customers served</p>
+          </div>
+          <div>
+            <h3>120+</h3>
+            <p>Premium products</p>
+          </div>
+          <div>
+            <h3>4.9★</h3>
+            <p>Trusted customer rating</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="device-wrap">
+        <div class="device">
+          <div class="device-screen">
+            <div class="device-top">
+              <div class="dots"><span></span><span></span><span></span></div>
+              <small style="color:#cbd5e1">Smart Premium UI</small>
+            </div>
+            <div class="mini-card">
+              <h4>Flagship Product Experience</h4>
+              <p style="color:#cbd5e1; line-height:1.7;">Interactive visuals, immersive storytelling, and luxury conversion sections.</p>
+            </div>
+            <div class="product-visual" style="display:grid;place-items:center;"><img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=80" alt="Premium smartphone" style="width:220px;height:220px;object-fit:contain;filter:drop-shadow(0 22px 30px rgba(0,0,0,0.45));"></div>
+            <div class="mini-card">
+              <h4>Instant Checkout Feel</h4>
+              <p style="color:#cbd5e1; line-height:1.7;">Elegant CTA flow, sleek cards, testimonials, FAQ, newsletter, and premium footer.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <div class="container">
+      <div class="section-head">
+        <span>Why choose us</span>
+        <h2>Luxury interactions designed to feel futuristic and effortless.</h2>
+        <p>Every block is crafted to give your project a premium brand identity with advanced UI polish, subtle motion, and refined details.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Smooth Motion</h3>
+          <p>Scroll-reveal animations, floating product visuals, hover transitions, and cinematic presentation across sections.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">✨</div>
+          <h3>Premium Aesthetic</h3>
+          <p>Glass layers, modern gradients, spacious typography, and Apple-inspired storytelling without copying branding directly.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🛍️</div>
+          <h3>Conversion Focus</h3>
+          <p>Strategic CTAs, featured collections, trust indicators, customer reviews, FAQ, and newsletter integration.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🌙</div>
+          <h3>Theme Switch</h3>
+          <p>A built-in theme toggle lets you instantly switch between dark and light premium visual styles.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="featured">
+    <div class="container">
+      <div class="section-head reveal">
+        <span>Featured collection</span>
+        <h2>Crafted for those who expect more from every detail.</h2>
+        <p>Showcase premium products with immersive layout blocks that elevate both perceived value and user trust.</p>
+      </div>
+
+      <div class="products-grid">
+        <div class="product-card reveal">
+          <div class="product-img"><img class="real-product-img" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80" alt="AeroPods Max headphones"></div>
+          <div class="product-body">
+            <div class="product-tag">Flagship Audio</div>
+            <h3>AeroPods Max</h3>
+            <p>High-fidelity premium headphones with immersive soundstage, adaptive performance, and signature elegance.</p>
+            <div class="price-row">
+              <div class="price">₹49,999</div>
+              <button class="primary-btn add-cart" data-name="AeroPods Max" data-price="49999">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card reveal">
+          <div class="product-img"><img class="real-product-img" src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=900&q=80" alt="VisionBook X laptop"></div>
+          <div class="product-body">
+            <div class="product-tag">Ultra Performance</div>
+            <h3>VisionBook X</h3>
+            <p>Professional-grade laptop aesthetics with ultra-thin design, power efficiency, and premium display styling.</p>
+            <div class="price-row">
+              <div class="price">₹1,29,999</div>
+              <button class="primary-btn add-cart" data-name="VisionBook X" data-price="129999">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card reveal">
+          <div class="product-img"><img class="real-product-img" src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=900&q=80" alt="Pulse Watch Pro smartwatch"></div>
+          <div class="product-body">
+            <div class="product-tag">Smart Lifestyle</div>
+            <h3>Pulse Watch Pro</h3>
+            <p>Elegant health-forward smartwatch design with refined UI identity and powerful wearable experience.</p>
+            <div class="price-row">
+              <div class="price">₹34,999</div>
+              <button class="primary-btn add-cart" data-name="Pulse Watch Pro" data-price="34999">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <div class="container showcase">
+      <div class="glass-banner">
+        <h3>Premium product storytelling that feels cinematic.</h3>
+        <p>
+          Use this section to highlight one hero product, launch event, seasonal campaign, or flagship brand offering.
+          The immersive glass panel and spacious layout create the kind of presentation that makes a project feel enterprise-grade.
+        </p>
+        <div class="specs">
+          <div class="spec-box">
+            <h4>240Hz</h4>
+            <p>Fluid visual response</p>
+          </div>
+          <div class="spec-box">
+            <h4>AI UI</h4>
+            <p>Smart product flow</p>
+          </div>
+          <div class="spec-box">
+            <h4>3D Feel</h4>
+            <p>Depth-based visuals</p>
+          </div>
+        </div>
+      </div>
+      <div class="glass-banner" style="background:linear-gradient(145deg, rgba(41,151,255,0.18), rgba(124,58,237,0.16)); display:flex; align-items:center; justify-content:center; min-height:420px;">
+        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80" alt="Luxury smartwatch" style="width:250px;height:250px;object-fit:contain;filter:drop-shadow(0 28px 40px rgba(0,0,0,0.45));animation: floatProduct 5s ease-in-out infinite;">
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <div class="container">
+      <div class="section-head">
+        <span>Customer feedback</span>
+        <h2>People love premium experiences that feel effortless.</h2>
+        <p>These testimonial cards add realism, trust, and project maturity — making your interface look complete and business-ready.</p>
+      </div>
+
+      <div class="testimonial-grid">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>"One of the most premium front-end shopping experiences I’ve seen in a student-level project. It genuinely feels like a real luxury tech store."</p>
+          <div class="user">
+            <div class="avatar">AR</div>
+            <div>
+              <strong>Aarav Mehta</strong>
+              <div style="color:var(--muted); font-size:0.9rem;">UI Enthusiast</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>"The animations, spacing, glass effects, and product layout all feel incredibly polished. It looks expensive in the best possible way."</p>
+          <div class="user">
+            <div class="avatar">SN</div>
+            <div>
+              <strong>Siya Nair</strong>
+              <div style="color:var(--muted); font-size:0.9rem;">Product Designer</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>"Theme switching, product cards, CTA placement, and the hero section all make this perfect for a premium portfolio or industrial showcase."</p>
+          <div class="user">
+            <div class="avatar">KP</div>
+            <div>
+              <strong>Karan Patel</strong>
+              <div style="color:var(--muted); font-size:0.9rem;">Tech Reviewer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal" id="faq">
+    <div class="container">
+      <div class="section-head">
+        <span>FAQ</span>
+        <h2>Everything your premium project should already include.</h2>
+      </div>
+
+      <div class="faq-wrap">
+        <div class="faq-item active">
+          <button class="faq-question">Does this website include theme switching? <span>+</span></button>
+          <div class="faq-answer">Yes. A built-in dark/light theme toggle is included and saved in browser localStorage so the selected theme stays active when reopened.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">Can I expand this into a full cart and checkout later? <span>+</span></button>
+          <div class="faq-answer">Yes. This structure is made so you can later connect product data, cart logic, checkout forms, and even admin or backend systems on top of it.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">Is it really built using only HTML, CSS, and JavaScript? <span>+</span></button>
+          <div class="faq-answer">Yes. Every page is self-contained and includes its own internal CSS and JavaScript exactly as requested.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">Can this be used as an industry-level project base? <span>+</span></button>
+          <div class="faq-answer">Definitely. The design language, interactions, layout quality, and multi-page structure make it a strong premium front-end foundation for an advanced academic or portfolio project.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section newsletter reveal">
+    <div class="container">
+      <div class="newsletter-box">
+        <div class="section-head" style="margin-bottom:0;">
+          <span>Newsletter</span>
+          <h2>Stay ahead of future launches.</h2>
+          <p>Get premium product drops, launch stories, and early access updates directly in your inbox.</p>
+        </div>
+        <form class="newsletter-form" id="newsletterForm">
+          <input type="email" id="newsletterEmail" placeholder="Enter your email address" required />
+          <button class="primary-btn" type="submit">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <a href="index.html" class="logo">LUXORA</a>
+          <p style="margin-top:12px;">A premium Apple-inspired e-commerce experience created using only HTML, CSS, and JavaScript for industry-level project presentation.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Pages</h4>
+          <a href="index.html">Home</a><br>
+          <a href="products.html">Products</a><br>
+          <a href="admin.html">Admin</a><br>
+          <a href="about.html">About</a><br>
+          <a href="contact.html">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h4>Features</h4>
+          <a href="#featured">Featured Products</a><br>
+          <a href="#faq">FAQ</a><br>
+          <a href="cart.html">Cart Preview</a><br>
+          <a href="#">Wishlist Ready UI</a>
+        </div>
+        <div class="footer-col">
+          <h4>Developer Info</h4>
+          <p>Project Type: Premium Frontend E-Commerce</p>
+          <p>Tech: HTML, CSS, JavaScript</p>
+          <p>Design Style: Luxury / Apple-inspired</p>
+        </div>
+      </div>
+      <div class="bottom-bar">
+        <p>© 2026 LUXORA. All rights reserved.</p>
+        <p>Designed for premium presentation and strong project impact.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const loader = document.getElementById('loader');
+    window.addEventListener('load', () => {
+      setTimeout(() => loader.classList.add('hide'), 900);
+    });
+
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (mobileToggle) {
+      mobileToggle.addEventListener('click', () => navLinks.classList.toggle('show'));
+    }
+
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('luxora-theme');
+    if (savedTheme === 'light') document.body.classList.add('light');
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light');
+      localStorage.setItem('luxora-theme', document.body.classList.contains('light') ? 'light' : 'dark');
+    });
+
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.15 });
+    reveals.forEach(el => observer.observe(el));
+
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        document.querySelectorAll('.faq-item').forEach(f => {
+          if (f !== item) f.classList.remove('active');
+        });
+        item.classList.toggle('active');
+      });
+    });
+
+    function updateCartCount() {
+      const cart = JSON.parse(localStorage.getItem('luxora-cart') || '[]');
+      document.querySelectorAll('.cart-badge').forEach(b => b.textContent = cart.length);
+    }
+
+    document.querySelectorAll('.add-cart').forEach(button => {
+      button.addEventListener('click', () => {
+        const cart = JSON.parse(localStorage.getItem('luxora-cart') || '[]');
+        cart.push({
+          name: button.dataset.name,
+          price: Number(button.dataset.price),
+          qty: 1
+        });
+        localStorage.setItem('luxora-cart', JSON.stringify(cart));
+        alert(button.dataset.name + ' added to cart!');
+        updateCartCount();
+      });
+    });
+
+    document.getElementById('newsletterForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('newsletterEmail').value.trim();
+      if (email) {
+        alert('Subscribed successfully: ' + email);
+        e.target.reset();
+      }
+    });
+
+    updateCartCount();
+  </script>
+</body>
+</html>
+```
+
+
